@@ -10,6 +10,15 @@ class Post extends CI_Controller
     $this->load->helper('url_helper');
   }
 
+  function validateForm()
+  {
+    $this->load->helper('form');
+    $this->load->library('form_validation');
+
+    $this->form_validation->set_rules('judul', 'Judul', 'required');
+    $this->form_validation->set_rules('deskripsi', 'Deskripsi', 'required');
+  }
+
   public function index()
   {
     $data['posts_data'] = $this->Post_model->get_all();
@@ -18,11 +27,7 @@ class Post extends CI_Controller
 
   public function create()
   {
-    $this->load->helper('form');
-    $this->load->library('form_validation');
-
-    $this->form_validation->set_rules('judul', 'Judul', 'required');
-    $this->form_validation->set_rules('deskripsi', 'Deskripsi', 'required');
+    $this->validateForm();
 
     if ($this->form_validation->run() === FALSE)
     {
@@ -45,5 +50,27 @@ class Post extends CI_Controller
     }
 
     $this->load->view('post/get', $data);
+  }
+
+  public function update($id)
+  {
+    $this->validateForm();
+
+    if ($this->form_validation->run() === FALSE)
+    {
+      $data['post_data'] = $this->Post_model->get($id);
+      $this->load->view('post/update', $data);
+    }
+    else
+    {
+      $this->Post_model->update();
+      redirect('post/get/' . $id);
+    }
+  }
+
+  public function delete($id)
+  {
+    $data['post_data'] = $this->Post_model->delete($id);
+    $this->load->view('post/delete_post');
   }
 }
